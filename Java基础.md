@@ -365,14 +365,17 @@ try{
 
 # Java集合
 
+## 各类型特点
+
 Java的集合：用来＂持有对象＂，根据持有方式不同，可以大概分为***集合(Collection)*** 和 ***映射(Map)*** 两种．
 
 + Collection:　按照某种规则，持有<font color=Red size=5>1个</font>对象元素；
      
     + List: 一般以插入的顺序保存元素；
        
-       + ArrayList: (可以看作可自动扩容数组)随机访问形式，访问效率高，添加效率低。
-       + LinkedList:　删减效率相对较高，访问效率低。
+       + ArrayList: (可以看作可自动扩容数组)以数组方式存储数据，随机访问形式，访问效率高，添加效率低。
+       + LinkedList:　以双向链表方式存储数据，删减效率相对较高，访问效率低。
+       + Vector：　同样以数组形式存储数据，但添加了synchronized修饰符，保证线程安全，但因此影响访问效率，目前已不推荐使用．
   
     + Queue：　一般从一端执行插入，在另一端执行取出操作，在<font color=Red size=4>并发编程</font>中尤为重要，可以将对象安全的从１个任务传递到另一个任务；
     + Set：　不允许存储重复元素，只要用于体现元素唯一．内部元素一般无序．
@@ -397,7 +400,77 @@ Java集合关系图如下所示．
 
 </div>
 
+## Collection和Collections的区别
+
++ Collection是集合类的总接口，适用于存储１个元素的集合．
++ Collections是集合工具类，提供了一系列静态方法，辅助集合操作，如排序、搜索、线程安全化等。
++ 另外还有一个Arrays工具类，是数组的工具类，提供一系列数组操作方法，如排序、搜索等。
+
 # Hashmap 原理
+
+## HashMap与Hashtable的区别
+
+1. 父类
+   
+   - Hashtable继承自Directory(已弃用)类
+   - HashMap继承自AbstractMap类
+   - 两者都实现了Map接口、Cloneable(可复制)接口、Serializable接口(可序列化)
+  
+2. 对外接口
+   
+   - Hashtable比HashMap多提供两个方法，elements()和contains();
+   - elements()方法继承自Directory类，用于返回Value枚举；
+   - contains()方法，用于返回是否包含该Value，与containsValue()方法一致。（Hashtable中containsValue()方法，只是简单调用了contains方法。）
+  
+3. 对于**null Key**和**null Value**的支持
+   
+   - Hashtable不支持 null Key,也不支持null Value；
+  ```java
+  //Hashtable put()操作时，需要调用hashCode方法
+  //如果key为null，则报异常
+  int hash = key.hashCode();
+  //当执行get()操作时，value==null，会直接抛出异常。
+  if(value == null){
+      throw new NullPointerException();
+  }
+  ```
+  - HashMap中，null可作为Key,也可以作为Value.但作为Key时，只能有１个，作为Value时，可以有多个。因此，HashMap中，不能用get()方法返回null判断是否存在某个Key,而应该用containsKey()方法。
+4. 线程安全性不同
+   - Hashtable中的每个方法都有synchronized修饰，因此是线程安全的
+   - HashMap不能保证线程安全。在多线程并发环境下，可能会产生死锁等问题,因此，使用Hashmap时，要自己增加同步处理。
+   - HashMap在单线程操作时，效率比Hashtable高很多。
+   - 当HashMap需要多线程并发操作时，可以使用currentHashMap代替，currentHashMap虽然是线程安全的，但其使用的分段锁，并非对整个数据加锁，因此效率比Hashtable高。
+5. 容量
+   - Hashtable初始容量为11,每次扩容为2n+1(尽量采用素数作为容量大小，在取模运算时，最大限度避免碰撞,使得元素分布尽量均匀)；
+   - HashMap初始容量为16，每次扩容为2n(取２的幂作为容量大小，易于取模计算，直接移位即可，大大提高了计算效率。)；
+   - HashMap取２的幂作为容量大小，提高计算效率的同时，也引入了哈希分布不均的问题，为解决这一问题，在HashMap中对hash算法做了一些调整。
+   - hash计算方式不同（原因即上一条）
+  ```java
+  //Hashtable
+  //Hashtable在计算index过程中，直接使用hashCode对表长度取余，用到了除法，影响计算效率。
+  int hash = key.hashCode();
+  int index = (hash & 0x7FFFFFFF) % tab.length;
+  //HashMap
+  //HashMap　使用移位运算代替除法运算，大大提高了计算效率
+  //但更容易引发hash冲突，因此对于hash值进行了重新调整计算
+  static final int hash(Object var0){
+      int hash;
+      return var0 == null ? 0 : (hash = var0.hashCode()) ^ hash >>> 16;
+  }
+  ```
+6. 解决hash冲突
+   
+   采用链表的形式，解决hash冲突，当发生冲突时，以链表形式存储在该位置。
+   
+   JDK 1.8之后，链表长度超过８时，HashMap采用红黑树存储.
+   > 冲突长度小于８时，采用链表形式存储;
+   <br>
+   冲突长度大于８时，采用红黑树形式存储
+   <br>
+   冲突重新小于６时，再次转回链表形式存储
+   
+# 线程、并发
+
 # JVM
 # JVM常量池
 # Java类加载机制
