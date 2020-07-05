@@ -301,6 +301,8 @@ class Demo extends A implements II{
 + Error: 一般指系统错误，发生在ＪＶＭ上，程序无法自行处理的错误．一般要通过修改源码的方式才能规避或解决．如内存溢出，栈溢出等．发生此类错误时，程序会终止．
 + Ｅxception: 异常，程序可以处理的异常，程序可以捕获并处理，如空引用，除数为０，数组越界等．发生此类异常时，应尽可能处理异常，保证程序正常运行，不至于被迫终止．
 
+![Java异常类型](https://www.weiyun.com/disk/folder/29d48310e488a47338b4f56c5f2ee4d6)
+
 <div align=center>
 
 ![Java异常类型][throwableImageBase64Str]
