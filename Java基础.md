@@ -391,6 +391,8 @@ Java的集合：用来＂持有对象＂，根据持有方式不同，可以大�
 
 Java集合关系图如下所示．
 
+![Java集合图](https://i.loli.net/2020/07/05/JCD9dXOMGT6WE7S.png)
+
 <div align=center>
 
 ![Java集合][JavaCollectionImageBase64Str]
