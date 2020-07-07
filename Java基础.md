@@ -476,6 +476,31 @@ Java集合关系图如下所示．
   //直接通过位运算求解得到，提高了运算性能
   int index = (len-1) & hash;
   ```
+
+## HashMap 属性
+
+HashMap的几个重要字段属性如下：
+
+```java
+    //　HashMap 哈希桶数组，存储对象元素的数组，元素类型为Node,hash冲突时以链表或红黑树形式添加数据
+    transient HashMap.Node<K, V>[] table;
+    //　HashMap中，所存储的键值对总数。
+    transient int size;
+    //　键值对变更次数，增加或值变更等。
+    transient int modCount;
+    //　HashMap所存储键值对数量阈值，一旦所存储键值对总数超过此值，即考虑扩容。
+    int threshold;
+    //　负载因子。threshold = length * Loadfactor,
+    // 该值默认为0.75
+    // 可以但不建议调整。可以大于１.（即：存储键值对数量阈值上限可以超过基础数组长度,多余的以链表或红黑树形式存储）
+    final float loadFactor;
+```
+
+注意：注意table.length、size和threshold的区别！
+   - table.length是指基础的哈希桶数组的长度;
+   - size是指HashMap中实际存储的键值对数量;
+   - threshold是指当前容量的HashMap中，所允许容纳键值对数量的阈值，<font color=#DDA0DD>并非哈希桶数组所占用槽位的阈值!</font>。
+
 ## HashMap扩容
 
 HashMap求取数组下标操作`int index = (len-1) & hash`
@@ -508,6 +533,8 @@ HashMap求取数组下标操作`int index = (len-1) & hash`
 ![HashMapput][HashMapputBase64str]
    
 # 线程、并发
+
+
 
 # JVM
 # JVM常量池
