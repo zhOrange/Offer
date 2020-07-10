@@ -1275,7 +1275,65 @@ Object.java包中含有wait()、notify()、notifyAll()方法，控制线程等�
      - 调用了exit()方法，并且exit()有权限被正常执行。
      - <font color=red size=3>所有的“非守护线程”都死了(即JVM中仅仅只有“守护线程”)。</font>
 
+## 线程池
 
+### 线程池优点
+
+即：为什么要使用线程池
+
+1. 重用线程池内的线程，避免线程频繁创建和销毁带来的系统开销；
+2. 控制线程池内并发线程数量，避免过多线程抢占系统资源导致阻塞；
+3. 对线程进行简单管理，如延时执行，定时循环等。
+
+### 线程池的创建
+
+1. 通过Executors工具类创建，Executors为提供了一系列工厂方法用于创建线程池，返回的线程池都实现了ExecutorService接口;
+
+```java
+    //通过Executors工具类，创建４种不同类型的线程池。
+    ExecutorService fixedThreadPool = Executors.newFixedThreadPool(10);
+    ExecutorService singleThreadPool = Executors.newSingleThreadPool();
+    ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+    ExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(5);
+```
+
+2. 通过ThreadPoolExecutor构造函数创建，通过自定义构造函数参数，创建定制化的线程池。
+
+   ThreadPoolExecutor的构造函数有多种重载形式：
+
+   ```java
+   //五个参数的构造函数
+   public ThreadPoolExecutor(int corePoolSize,
+                          int maximumPoolSize,
+                          long keepAliveTime,
+                          TimeUnit unit,
+                          BlockingQueue<Runnable> workQueue)
+
+    //六个参数的构造函数-1
+    public ThreadPoolExecutor(int corePoolSize,
+                          int maximumPoolSize,
+                          long keepAliveTime,
+                          TimeUnit unit,
+                          BlockingQueue<Runnable> workQueue,
+                          ThreadFactory threadFactory)
+
+    //六个参数的构造函数-2
+    public ThreadPoolExecutor(int corePoolSize,
+                          int maximumPoolSize,
+                          long keepAliveTime,
+                          TimeUnit unit,
+                          BlockingQueue<Runnable> workQueue,
+                          RejectedExecutionHandler handler)
+
+    //七个参数的构造函数
+    public ThreadPoolExecutor(int corePoolSize,
+                          int maximumPoolSize,
+                          long keepAliveTime,
+                          TimeUnit unit,
+                          BlockingQueue<Runnable> workQueue,
+                          ThreadFactory threadFactory,
+                          RejectedExecutionHandler handler)
+   ```
 
 # JVM
 # JVM常量池
