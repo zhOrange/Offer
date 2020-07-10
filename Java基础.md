@@ -1114,8 +1114,57 @@ public class SnchronizedTest {
 }
 
 ```
+### 实例锁和全局锁
 
+- 实例锁：　对实例对象加锁，线程获得锁后，可以访问该对象的同步方法或代码块，其他访问该对象同步方法或代码块的线程将被阻塞。（如果该实例对象为单类，则该锁即为该单类的全局锁）实例锁对应的关键字为<font color=#ff6677>synchronized</font>。
+- 全局锁：　对类加锁。无论该类有多少个实例对象，都共享该锁。全局锁对应的关键字为<font color=#ff6677>static synchronized</font>。
 
+```java
+pulbic class Something {
+    //实例锁同步方法 A
+    public synchronized void isSyncA(){}
+    //实例锁同步方法 B
+    public synchronized void isSyncB(){}
+    //实例锁同步方法 A
+    public static synchronized void cSyncA(){}
+    //实例锁同步方法 B
+    public static synchronized void cSyncB(){}
+}
+
+//　定义Something类的两个实例对象x、y
+Something x, y;
+
+//1. 两个线程A、B分别调用x.isSyncA()、x.isSyncB()
+//
+//    x.isSyncA()和x.isSyncB()不能同时调用运行，会发生阻塞。
+//　　因为两个方法都是实例锁同步方法，两个方法的同步监视器都是其调用对象x,
+//   在一个线程A获取实例对象x的同步锁后，另一个线程B不能再获取x的锁
+//   B调用x的同步方法会被阻塞。
+x.isSyncA()与x.isSyncB()
+
+//2. 两个线程A、B分别调用x.isSyncA()、y.isSyncA()
+//    x.isSyncA()与y.isSyncA() 可以同时调用执行，不会发生阻塞。
+//    因为x.isSyncA()方法的同步监视器是调用其的实例对象x，
+//    y.isSyncA()方法的同步监视器是调用其的实例对象y，
+//    线程A获得实例对象x的同步锁后，不影响线程B获得实例对象y同步锁。
+//    两个线程各自获得实例对象同步锁后，可以分别执行其同步方法或代码块。
+x.isSyncA()与y.isSyncA()
+
+//３. 两个线程A、B分别调用x.cSyncA()、y.cSyncB()
+//    x.cSyncA()与y.cSyncB()，不能同时执行，会发生阻塞。
+//　　因为cSyncA()和cSyncB()是全局锁，会对整个类加锁。
+//    x.cSyncA()相当于Something.cSyncA()，y.cSyncB()相当于Something.cSyncB()，
+//　　Something类的两个实例对象x、y会共享该同步锁。
+//   在线程A获得实例对象x的同步锁，也就是Something类的全局锁后，线程B就不能再得到实例对象y的全局同步锁
+//　　因此在线程A获得同步锁，执行x.cSyncA()的时候，线程B将会被阻塞。
+x.cSyncA()与y.cSyncB()
+
+//4. 两个线程A、B分别调用x.isSyncA()、Something.cSyncA()
+//    x.isSyncA()、Something.cSyncA()，可以同时执行，不会被阻塞
+//    线程A获得的是实例对象x的锁，线程B获得的是Something类的全局锁
+//   两者不是同一个锁，不会发生阻塞，可以同时执行。
+x.isSyncA()与Something.cSyncA()
+```
 
 
 # JVM
