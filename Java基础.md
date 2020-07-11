@@ -370,13 +370,13 @@ try{
 Java的集合：用来＂持有对象＂，根据持有方式不同，可以大概分为***集合(Collection)*** 和 ***映射(Map)*** 两种．
 
 + Collection:　按照某种规则，持有<font color=Red size=5>1个</font>对象元素；
-     
+  
     + List: 一般以插入的顺序保存元素；
-       
+      
        + ArrayList: (可以看作可自动扩容数组)以数组方式存储数据，随机访问形式，访问效率高，添加效率低。
        + LinkedList:　以双向链表方式存储数据，删减效率相对较高，访问效率低。
        + Vector：　同样以数组形式存储数据，但添加了synchronized修饰符，保证线程安全，但因此影响访问效率，目前已不推荐使用．
-  
+    
     + Queue：　一般从一端执行插入，在另一端执行取出操作，在<font color=Red size=4>并发编程</font>中尤为重要，可以将对象安全的从１个任务传递到另一个任务；
     + Set：　不允许存储重复元素，只要用于体现元素唯一．内部元素一般无序．
     
@@ -406,9 +406,9 @@ Java集合关系图如下所示．
 + Collections是集合工具类，提供了一系列静态方法，辅助集合操作，如排序、搜索、线程安全化等。
 + 另外还有一个Arrays工具类，是数组的工具类，提供一系列数组操作方法，如排序、搜索等。
 
-# Hashmap 原理
+## Hashmap 原理
 
-## HashMap 存储结构
+### HashMap 存储结构
 
 以链表＋数组或红黑树的结构存储。
 
@@ -416,7 +416,7 @@ Java集合关系图如下所示．
 
 ![HashMapNode][hashmapnodebase64str]
 
-## HashMap与Hashtable的区别
+### HashMap与Hashtable的区别
 
 1. 父类
    
@@ -485,7 +485,7 @@ Java集合关系图如下所示．
   int index = (len-1) & hash;
   ```
 
-## HashMap 属性
+### HashMap 属性
 
 HashMap的几个重要字段属性如下：
 
@@ -509,7 +509,7 @@ HashMap的几个重要字段属性如下：
    - size是指HashMap中实际存储的键值对数量;
    - threshold是指当前容量的HashMap中，所允许容纳键值对数量的阈值，<font color=#DDA0DD>并非哈希桶数组所占用槽位的阈值!</font>。
 
-## HashMap扩容
+### HashMap扩容
 
 HashMap求取数组下标操作`int index = (len-1) & hash`
 
@@ -609,10 +609,10 @@ resize方法源码:
  }
 ```
 
-## HashMap解决hash冲突
-   
+### HashMap解决hash冲突
+
    采用链表的形式，解决hash冲突，当发生冲突时，以链表形式存储在该位置。
-   
+
    JDK 1.8之后，链表长度超过８时，HashMap采用红黑树存储.
    > 冲突长度小于８时，采用链表形式存储;
    <br>
@@ -622,7 +622,7 @@ resize方法源码:
 
    HashMap中有一个<font color=red>MIN_TREEIFY_CAPACITY</font>属性，默认为６４，只有当散列表长度大于此值的时候才会将链表转换为红黑树，否则就扩容。（为了避免散列表中有过多的红黑树转化，影响效率）
 
-## HashMap　put操作
+### HashMap　put操作
 
 ![HashMapput][HashMapputBase64str]
 
@@ -687,7 +687,7 @@ public V put(K key, V value) {
      return null;
  }
 ```
-   
+
 # 线程、并发
 
 ## 并发与并行的区别
@@ -1298,10 +1298,24 @@ Object.java包中含有wait()、notify()、notifyAll()方法，控制线程等�
 ```
 
 2. 通过ThreadPoolExecutor构造函数创建，通过自定义构造函数参数，创建定制化的线程池。
+   其实Executors工具类所提供的几种构造方法，也是基于ThreadPoolExecutor构造函数创建的不同特性的线程池，如`Executors.newFixedThreadPool(int nThreads);`方法，定义如下：
+   ```java
+   public static ExecutorService newFixedThreadPool(int nThreads) {
+       //利用 ThreadPoolExecutor 构造方法创建１个线程池对象并返回。
+        return new ThreadPoolExecutor(nThreads, nThreads,
+                                      0L, TimeUnit.MILLISECONDS,
+                                      new LinkedBlockingQueue<Runnable>());
+    }
+   ```
 
    ThreadPoolExecutor的构造函数有多种重载形式：
 
    ```java
+
+    // 以下多种重载形式的构造函数，
+    // 其实都是在设置默认参数的基础上，
+    // 调用了７个参数的那个基础构造方法。
+
    //五个参数的构造函数
    public ThreadPoolExecutor(int corePoolSize,
                           int maximumPoolSize,
@@ -1334,6 +1348,54 @@ Object.java包中含有wait()、notify()、notifyAll()方法，控制线程等�
                           ThreadFactory threadFactory,
                           RejectedExecutionHandler handler)
    ```
+
+   线程池主要参数释义：
+
+   1. `int corePoolSize`:　线程池中核心线程数最大值。
+   
+      > 核心线程：
+      >   - 线程池新建线程的时候，如果当前线程总数小于corePoolSize，则新建的线程为核心线程；如果当前线程总数超过了corePoolSize，则新建的线程为非核心线程。
+      >   - 核心线程默认情况下会一直存在于线程池中，即使它什么也不做（闲置状态）
+      >   - 如果指定ThreadPoolExecutor的allowCoreThreadTimeOut这个属性为true，那么线程处于闲置状态超过一定时间的话，就会被销毁。
+
+   2. `int maximumPoolSize`:　该线程池中，所能容纳的线程总数最大值。
+      > 线程总数　＝　核心线程数　＋　非核心线程数。
+   3. `long keepAliveTime`: 线程池中，**非核心线程**超时时长。
+      > 当线程池中的<font color=gree>非核心线程</font>闲置时间超过此时长后，就会**销毁该非核心线程**。
+      > <br>
+      > 如果设置`allowCoreThreadTimeOut = true`，则会作用于<font color=#dd99cc>**核心线程**</font>
+   4. `TimeUnit unit`:　keepAliveTime的单位
+   
+      > TimeUnit是一个枚举类型：
+      >   1. NANOSECONDS  ： 1纳秒 = 1微秒 / 1000
+      >   2. MICROSECONDS ： 1微秒 = 1毫秒 / 1000
+      >   3. MILLISECONDS ： 1毫秒 = 1秒 /1000
+      >   4. SECONDS  ： 秒
+      >   5. MINUTES  ： 分
+      >   6. HOURS    ： 小时
+      >   7. DAYS     ： 天
+
+   5. `BlockingQueue<Runnable> workQueue`:　该线程池中的任务队列，维护着等待执行的Runnable对象
+
+      > workQueue让线程池实现了阻塞功能。
+      > <br>
+      > 线程池新添加线程任务的过程(counts为线程池中当前线程总数)：
+      >    - `counts < corePoolSize`：　直接添加到核心线程池中
+      >    - `corePoolSize < counts <= corePoolSize + workQueue.size()`：所有任务皆为核心线程，当核心线程全部处于运行状态，则将新的任务添加到workQueue中等待。
+      >    - `corePoolSize + workQueue.size() < counts <= maximumPoolSize + workQueue.size()`：　corePoolSize 个线程由核心线程执行，剩下的workQueue.size()个线程在队列中等待，超出队列长度 workQueue.size() 的任务，将另启动非核心线程执行。
+      >    - `counts > maximumPoolSize + workQueue.size()`：　直接抛出异常。
+
+   6. `ThreadFactory threadFactory`:　创建线程的方式，是一个接口，你new他的时候需要实现他的Thread newThread(Runnable r)方法。（其实只是指定了一下线程名称）一般用不到它。
+      ```java
+      new ThreadFactory(){
+          private final AtomicInteger mCount = new AtomicInteger(1);
+          @Override
+          public Thread new Thread(Runnable r){
+              return new Thread(r, "Thread_#" + mCount.getAndIncrement())
+          }
+      }
+      ```
+   7. `RejectedExecutionHandler handler`:　抛出异常。
 
 # JVM
 # JVM常量池
