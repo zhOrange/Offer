@@ -1385,7 +1385,7 @@ Object.java包中含有wait()、notify()、notifyAll()方法，控制线程等�
       >    - `corePoolSize + workQueue.size() < counts <= maximumPoolSize + workQueue.size()`：　corePoolSize 个线程由核心线程执行，剩下的workQueue.size()个线程在队列中等待，超出队列长度 workQueue.size() 的任务，将另启动非核心线程执行。
       >    - `counts > maximumPoolSize + workQueue.size()`：　直接抛出异常。
 
-   6. `ThreadFactory threadFactory`:　创建线程的方式，是一个接口，你new他的时候需要实现他的Thread newThread(Runnable r)方法。（其实只是指定了一下线程名称）一般用不到它。
+   6. `ThreadFactory threadFactory`:　创建线程的工厂，是一个接口，你new他的时候需要实现他的Thread newThread(Runnable r)方法。（其实只是指定了一下线程名称）一般用不到它。
       ```java
       new ThreadFactory(){
           private final AtomicInteger mCount = new AtomicInteger(1);
@@ -1395,7 +1395,8 @@ Object.java包中含有wait()、notify()、notifyAll()方法，控制线程等�
           }
       }
       ```
-   7. `RejectedExecutionHandler handler`:　抛出异常。
+   7. `RejectedExecutionHandler handler`:　拒绝策略，线程池运行线程数量超过maximumPoolSize时的拒绝策略。
+
 
 # JVM
 # JVM常量池
